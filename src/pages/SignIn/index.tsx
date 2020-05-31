@@ -6,7 +6,8 @@ import * as Yup from 'yup';
 import logoImg from '../../assets/logo.svg';
 import getValidationErrors from '../../utils/getValidationErrors';
 
-import { useAuth } from '../../hooks/AuthContext';
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 import { Container, Content, Background } from './styles';
 
 import Button from '../../components/Button';
@@ -19,7 +20,8 @@ interface SignInFormData {
 
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-  const { user, singIn } = useAuth();
+  const { singIn } = useAuth();
+  const { addToast } = useToast();
 
   const handleSubmit = useCallback(
     async (data: SignInFormData) => {
@@ -37,7 +39,7 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        singIn({
+        await singIn({
           email: data.email,
           password: data.password,
         });
@@ -48,9 +50,13 @@ const SignIn: React.FC = () => {
         }
 
         // disparar um toast
+        addToast({
+          type: 'success',
+          title: 'Erro na autenticao',
+        });
       }
     },
-    [singIn],
+    [singIn, addToast],
   );
 
   return (
